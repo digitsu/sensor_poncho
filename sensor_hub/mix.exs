@@ -52,6 +52,9 @@ defmodule SensorHub.MixProject do
       {:nerves_runtime, "~> 0.13.0"},
 
       # Dependencies for all targets except :host
+      {:veml6030, path: "../veml6030", targets: @all_targets},
+      {:sgp40, "~> 0.1.5", targets: @all_targets},
+      {:bmp280, "~> 0.2.5", targets: @all_targets},
       {:nerves_pack, "~> 0.7.0", targets: @all_targets},
 
       # Dependencies for specific targets
