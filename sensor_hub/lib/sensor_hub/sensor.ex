@@ -20,7 +20,11 @@ defmodule SensorHub.Sensor do
 
   def convert_fn(SGP40) do
     fn reading ->
-      Map.take(reading, [:voc_index])
+      case reading do
+        {:ok, measurement} ->
+          Map.take(measurement, [:voc_index])
+	_ -> %{}
+      end
     end
   end
 
