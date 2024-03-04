@@ -3,6 +3,7 @@ defmodule SensorHub.Application do
   # for more information on OTP Applications
   @moduledoc false
 
+  alias SensorHub.Sensor
   use Application
 
   @impl true
@@ -37,8 +38,25 @@ defmodule SensorHub.Application do
       # {SensorHub.Worker, arg},
       {SGP40, [i2c_address: 0x59, name: SGP40]},
       {BMP280, [i2c_address: 0x77, name: BMP280]},
-      {VEML6030, %{}}
+      {VEML6030, %{}},
+      {Finch, name: WeatherTrackerClient},
+      {
+        Publisher,
+        %{
+          sensors: sensors(),
+          weather_tracker_url: weather_tracker_url()
+        }
+
+      }
     ]
+  end
+
+  defp sensors do
+    [Sensor.new(BMP280), Sensor.new(VEML6030), Sensor.new(SGP40)]
+  end
+
+  defp weather_tracker_url do
+    Application.get_env(:sensor_hub, :weather_tracker_url)
   end
 
   def target() do
