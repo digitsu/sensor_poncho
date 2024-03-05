@@ -29,11 +29,31 @@ defmodule SensorHub.Sensor do
   end
 
   def convert_fn(BMP280) do
+    apply_transformation = fn {key, value} ->
+        new_value =
+          case key do
+            :altitude_m -> abs(value) - 100
+            :pressure_pa -> value / 100
+            #:temperature_c -> value
+            #:humidity_rh -> value
+            #:dew_point_c -> value
+            #:gas_resistance_ohms -> value
+            _ -> value
+          end
+        {key, new_value}
+      end
+
     fn reading ->
       case reading do
         {:ok, measurement} ->
-          Map.take(measurement, [:altitude_m, :pressure_pa, :temperature_c])
+          updates = measurement
+          |> Map.from_struct()
+          |> Enum.map(apply_transformation)
+          |> Enum.into(%{})
 
+          output_struct = struct!(measurement, updates)
+          |> Map.take([:altitude_m, :pressure_pa, :temperature_c, :humidity_rh, :dew_point_c, :gas_resistance_ohms])
+          output_struct
         _ ->
           %{}
       end
